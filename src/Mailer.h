@@ -32,14 +32,14 @@ namespace dispatch {
 class Mailer
 {
 public:
-  Mailer(lepcpplib::SmartPointer<lepcpplib::Socket> socket);
+  Mailer(lep::SmartPointer<lep::Socket> socket);
   ~Mailer();
 
   void Send(Message& message);
   void Receive(Message& message);
 
 private:
-  lepcpplib::SmartPointer<lepcpplib::Socket> socket_;
+  lep::SmartPointer<lep::Socket> socket_;
 };
 } // namespace dispatch
 

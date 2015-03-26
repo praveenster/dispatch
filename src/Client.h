@@ -42,9 +42,9 @@ public:
   void Receive(Message& message);
 
 private:
-  lepcpplib::SmartPointer<lepcpplib::Socket> socket_;
+  lep::SmartPointer<lep::Socket> socket_;
   int port_;
-  lepcpplib::SmartPointer<Mailer>  mailer_;
+  lep::SmartPointer<Mailer>  mailer_;
 };
 } // namespace dispatch
 

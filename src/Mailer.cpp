@@ -23,10 +23,10 @@
 #include "Mailer.h"
 #include "Logger.h"
 
-using namespace lepcpplib;
+using namespace lep;
 
 namespace dispatch {
-Mailer::Mailer(lepcpplib::SmartPointer<lepcpplib::Socket> socket)
+Mailer::Mailer(lep::SmartPointer<lep::Socket> socket)
 : socket_(socket)
 {
 }

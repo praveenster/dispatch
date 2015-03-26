@@ -39,13 +39,13 @@ public:
   void Start();
   void Stop();
 
-  void AddListener(lepcpplib::SmartPointer<ServerListener> listener);
+  void AddListener(lep::SmartPointer<ServerListener> listener);
 
 private:
-  lepcpplib::Socket server_socket_;
+  lep::Socket server_socket_;
   int port_;
   bool shutdown_;
-  lepcpplib::SmartPointer<ServerListener> listener_;
+  lep::SmartPointer<ServerListener> listener_;
 };
 } // namespace dispatch
 

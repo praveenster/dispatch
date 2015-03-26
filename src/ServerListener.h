@@ -31,7 +31,7 @@ namespace dispatch {
 class ServerListener
 {
 public:
-  virtual void OnClientConnected(lepcpplib::SmartPointer<Mailer> mailer) = 0;
+  virtual void OnClientConnected(lep::SmartPointer<Mailer> mailer) = 0;
 };
 } // namespace dispatch
 

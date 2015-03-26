@@ -28,7 +28,7 @@
 #include "Server.h"
 #include "Mailer.h"
 
-using namespace lepcpplib;
+using namespace lep;
 
 namespace dispatch {
 enum
@@ -88,7 +88,7 @@ void Server::Stop()
   shutdown_ = true;
 }
 
-void Server::AddListener(lepcpplib::SmartPointer<ServerListener> listener)
+void Server::AddListener(SmartPointer<ServerListener> listener)
 {
   listener_ = listener;
 }

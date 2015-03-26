@@ -23,7 +23,7 @@
 #include "Client.h"
 #include "SocketAddress.h"
 
-using namespace lepcpplib;
+using namespace lep;
 
 namespace dispatch {
 Client::Client(int port)
