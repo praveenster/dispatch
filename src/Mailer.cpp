@@ -26,7 +26,7 @@
 using namespace lep;
 
 namespace dispatch {
-Mailer::Mailer(lep::SmartPointer<lep::Socket> socket)
+Mailer::Mailer(SmartPointer<Socket> socket)
 : socket_(socket)
 {
 }
@@ -38,7 +38,7 @@ Mailer::~Mailer()
 
 void Mailer::Send(Message& message)
 {
-  int length = message.serialized_size();
+  int length = message.GetSerializedSize();
   if ((socket_!= 0) && (length != 0)) {
     char* buffer = new char[length];
     message.Serialize(buffer, length);
@@ -50,10 +50,9 @@ void Mailer::Send(Message& message)
 void Mailer::Receive(Message& message)
 {
   if (socket_ != 0) {
-    int header_size = sizeof(message.type_) + sizeof(message.version_) +
-      sizeof(message.length_);
+    int header_size = message.GetHeaderSize();
 
-    char* buffer = new char[header_size];
+    char buffer[header_size];
     bool ok = true;
     int result;
 
@@ -67,13 +66,14 @@ void Mailer::Receive(Message& message)
 
     if (ok) {
       message.DeserializeHeader(buffer, header_size);
+      int length = message.length();
 
-      if (message.length_ > 0) {
-        message.body_ = new char[message.length_];
+      if (length > 0) {
         int offset = 0;
+        char* body = message.body();
 
         do {
-          result = socket_->Receive((char*)(message.body_ + offset), message.length_ - offset, 0);
+          result = socket_->Receive((char*)(body + offset), length - offset, 0);
           if ((result == 0) || (result == -1)) {
             ok = false;
             break;
@@ -81,7 +81,7 @@ void Mailer::Receive(Message& message)
 
           offset += result;
 
-          if (offset == message.length_) {
+          if (offset == length) {
             ok = true;
             break;
           }
@@ -92,8 +92,6 @@ void Mailer::Receive(Message& message)
     else {
       LOG_E("Error receving data. Not ok! Socket error = %d\n", socket_->GetLastError());
     }
-
-    delete[] buffer;
   }
 }
 

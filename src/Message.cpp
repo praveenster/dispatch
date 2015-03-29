@@ -24,6 +24,8 @@
 #include <cstring>
 #include "Message.h"
 
+using lep::String;
+
 namespace dispatch {
 Message::Message(int type)
 : type_(type), version_(0), length_(0), body_(0)
@@ -72,10 +74,10 @@ void Message::SerializeBuffer(char* buffer, int& length, const char* value, int 
   length += count;
 }
 
-void Message::SerializeString(char* buffer, int& length, const char* value)
+void Message::SerializeString(char* buffer, int& length, const String& value)
 {
-  int temp = strlen(value);
-  SerializeBuffer(buffer, length, value, temp);
+  int temp = value.length();
+  SerializeBuffer(buffer, length, value.toCharArray(), temp);
   buffer[temp] = '\0'; // include '\0'
   length++;
 }
@@ -93,7 +95,7 @@ void Message::Serialize(char* buffer, int& length)
   }
 }
 
-int Message::serialized_size()
+int Message::GetSerializedSize()
 {
   return sizeof(type_) + sizeof(version_) + sizeof(length_) + length_;
 }
@@ -126,17 +128,11 @@ unsigned int Message::DeserializeUint(char* buffer, int& length)
   return (ubuffer[3] << 24) | (ubuffer[2] << 16) | (ubuffer[1] << 8) | (ubuffer[0]);
 }
 
-char* Message::DeserializeString(char* buffer, int& length)
+String Message::DeserializeString(char* buffer, int& length)
 {
-  // CAUTION: no memory is allocated. value will point
-  // to the contained null terminated string.
-  int i = 0;
-  while(buffer[i] != '\0') {
-   i++;
-  }
-
-  length += i + 1;
-  return buffer;
+  String value(buffer);
+  length = value.length() + 1; // for null terminator;
+  return value;
 }
 
 void Message::DeserializeBuffer(char* buffer, int& length, char* value, int count)
@@ -158,11 +154,6 @@ void Message::Deserialize(char* buffer, int& length)
   }
 }
 
-int Message::deserialized_size()
-{
-  return sizeof(type_) + sizeof(version_) + sizeof(length_) + length_;
-}
-
 void Message::DeserializeHeader(char* buffer, int length)
 {
   int temp = 0;
@@ -170,7 +161,37 @@ void Message::DeserializeHeader(char* buffer, int length)
   version_ = DeserializeShortInt(buffer + temp, temp);
   length_ = DeserializeInt(buffer + temp, temp);
   delete[] body_;
-  body_ = NULL;
+  if (length_ > 0) {
+  	body_ = new char[length_];
+  }
+  else {
+  	body_ = 0;
+  }
+}
+
+short int Message::type()
+{
+	return type_;
+}
+
+short int Message::version()
+{
+	return version_;
+}
+
+int Message::length()
+{
+	return length_;
+}
+
+char* Message::body()
+{
+	return body_;
+}
+
+int Message::GetHeaderSize()
+{
+	return sizeof(type_) + sizeof(version_) + sizeof(length_);
 }
 } // namespace dispatch
 

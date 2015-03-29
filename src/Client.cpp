@@ -51,6 +51,9 @@ void Client::Connect()
 
 void Client::Disconnect()
 {
+  if (socket_ != 0) {
+    socket_->Close();
+  }
 }
 
 void Client::Send(Message& message)

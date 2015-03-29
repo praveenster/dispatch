@@ -86,6 +86,9 @@ void Server::Start()
 void Server::Stop()
 {
   shutdown_ = true;
+  // next call shutdown on the server socket.
+  // this will call it to abort the accept. this means, however,
+  // that it is important to handle failure return from accept.
 }
 
 void Server::AddListener(SmartPointer<ServerListener> listener)

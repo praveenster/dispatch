@@ -24,25 +24,26 @@
 #ifndef DISPATCH_MESSAGE_H_
 #define	DISPATCH_MESSAGE_H_
 
+#include "String.h"
+
 namespace dispatch {
 class Message
 {
 public:
-  virtual void Serialize(char* buffer, int& length);
-  virtual int serialized_size();
-
   virtual void Deserialize(char* buffer, int& length);
-  virtual int deserialized_size();
+  virtual void Serialize(char* buffer, int& length);
+  virtual int GetSerializedSize();
 
   void DeserializeHeader(char* buffer, int length);
+  int GetHeaderSize();
+
+	short int type();
+	short int version();
+	int length();
+	char* body();
 
   Message(int type);
   virtual ~Message();
-
-  short int type_;
-  short int version_;
-  int       length_;
-  char*     body_;
 
 protected:
   void SerializeByte(char* buffer, int& length, unsigned char value);
@@ -50,14 +51,19 @@ protected:
   void SerializeInt(char* buffer, int& length, int value);
   void SerializeUint(char* buffer, int& length, unsigned int value);
   void SerializeBuffer(char* buffer, int& length, const char* value, int count);
-  void SerializeString(char* buffer, int& length, const char* value);
+  void SerializeString(char* buffer, int& length, const lep::String& value);
 
   short int DeserializeByte(char* buffer, int& length);
   short int DeserializeShortInt(char* buffer, int& length);
   int DeserializeInt(char* buffer, int& length);
   unsigned int DeserializeUint(char* buffer, int& length);
-  char* DeserializeString(char* buffer, int& length);
+  lep::String DeserializeString(char* buffer, int& length);
   void DeserializeBuffer(char* buffer, int& length, char* value, int count);
+
+  short int type_;
+  short int version_;
+  int       length_;
+  char*     body_;
 
 private:
   Message(const Message&);
