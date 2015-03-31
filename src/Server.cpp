@@ -65,16 +65,19 @@ void Server::Start()
     LOG_D("Inbound Connect from  %s, port %d\n",
       client_socket->remote_address().address().toCharArray(), client_socket->remote_address().port());
 
-    /*
-    if (client_socket == -1) {
-        LOG_E("Accept failed with error %d\n", errno);
-        continue;
+    if (client_socket != NULL) {
+      if (listener_ != NULL) {
+        SmartPointer<Mailer> mailer = new Mailer(client_socket);
+        listener_->OnClientConnected(mailer);
+      }
+      else {
+        LOG_W("No registered listener. Closing connection.");
+        client_socket->Close();
+      }
     }
-    */
-
-    if (listener_ != NULL) {
-      SmartPointer<Mailer> mailer = new Mailer(client_socket);
-      listener_->OnClientConnected(mailer);
+    else {
+      LOG_E("Accept failed with error %d\n", server_socket_.GetLastError());
+      continue;
     }
   }
 
@@ -89,12 +92,12 @@ void Server::Stop()
   // next call shutdown on the server socket.
   // this will call it to abort the accept. this means, however,
   // that it is important to handle failure return from accept.
+  server_socket_.Shutdown(Socket::kBoth);
 }
 
 void Server::AddListener(SmartPointer<ServerListener> listener)
 {
   listener_ = listener;
 }
-
 } // namespace dispatch
 
