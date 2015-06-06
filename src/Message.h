@@ -53,7 +53,7 @@ protected:
   void SerializeBuffer(char* buffer, int& length, const char* value, int count);
   void SerializeString(char* buffer, int& length, const lep::String& value);
 
-  short int DeserializeByte(char* buffer, int& length);
+  unsigned char DeserializeByte(char* buffer, int& length);
   short int DeserializeShortInt(char* buffer, int& length);
   int DeserializeInt(char* buffer, int& length);
   unsigned int DeserializeUint(char* buffer, int& length);

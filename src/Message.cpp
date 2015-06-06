@@ -39,60 +39,74 @@ Message::~Message()
 
 void Message::SerializeByte(char* buffer, int& length, unsigned char value)
 {
-  buffer[0] = (char)value;
-  length += 1;
+  if (buffer != NULL) {
+    buffer[0] = (char)value;
+    length += 1;
+  }
 }
 
 void Message::SerializeShortInt(char* buffer, int& length, short int value)
 {
-  buffer[0] = (char) (value & 0xff);
-  buffer[1] = (char) ((value & 0xff00) >> 8);
-  length += 2;
+  if (buffer != NULL) {
+    buffer[0] = (char) (value & 0xff);
+    buffer[1] = (char) ((value & 0xff00) >> 8);
+    length += 2;
+  }
 }
 
 void Message::SerializeInt(char* buffer, int& length, int value)
 {
-  buffer[0] = (char) (value & 0xff);
-  buffer[1] = (char) ((value & 0xff00) >> 8);
-  buffer[2] = (char) ((value & 0xff0000) >> 16);
-  buffer[3] = (char) ((value & 0xff000000) >> 24);
-  length += 4;
+  if (buffer != NULL) {
+    buffer[0] = (char) (value & 0xff);
+    buffer[1] = (char) ((value & 0xff00) >> 8);
+    buffer[2] = (char) ((value & 0xff0000) >> 16);
+    buffer[3] = (char) ((value & 0xff000000) >> 24);
+    length += 4;
+  }
 }
 
 void Message::SerializeUint(char* buffer, int& length, unsigned int value)
 {
-  buffer[0] = (char) (value & 0xff);
-  buffer[1] = (char) ((value & 0xff00) >> 8);
-  buffer[2] = (char) ((value & 0xff0000) >> 16);
-  buffer[3] = (char) ((value & 0xff000000) >> 24);
-  length += 4;
+  if (buffer != NULL) {
+    buffer[0] = (char) (value & 0xff);
+    buffer[1] = (char) ((value & 0xff00) >> 8);
+    buffer[2] = (char) ((value & 0xff0000) >> 16);
+    buffer[3] = (char) ((value & 0xff000000) >> 24);
+    length += 4;
+  }
 }
 
 void Message::SerializeBuffer(char* buffer, int& length, const char* value, int count)
 {
-  memcpy(buffer, value, count);
-  length += count;
+  if ((buffer != NULL) && (value != NULL) && (count > 0)) {
+    memcpy(buffer, value, count);
+    length += count;
+  }
 }
 
 void Message::SerializeString(char* buffer, int& length, const String& value)
 {
-  int temp = value.length();
-  SerializeBuffer(buffer, length, value.toCharArray(), temp);
-  buffer[temp] = '\0'; // include '\0'
-  length++;
+  if (buffer != NULL) {
+    int offset = value.length();
+    SerializeBuffer(buffer, length, value.toCharArray(), offset);
+    buffer[offset] = '\0'; // include '\0'
+    length++;
+  }
 }
 
 void Message::Serialize(char* buffer, int& length)
 {
-  // initialize the length. increment as variables are serialized.
-  length = 0;
-  SerializeShortInt(buffer, length, type_);
-  SerializeShortInt(buffer + length, length, version_);
-  SerializeInt(buffer + length, length, length_);
+  if (buffer != NULL) {
+    // initialize the length. increment as variables are serialized.
+    length = 0;
+    SerializeShortInt(buffer, length, type_);
+    SerializeShortInt(buffer + length, length, version_);
+    SerializeInt(buffer + length, length, length_);
 
-  if (length_) {
-    SerializeBuffer(buffer + length, length, body_, length_);
-  }
+    if (length_) {
+      SerializeBuffer(buffer + length, length, body_, length_);
+    }
+  }    
 }
 
 int Message::GetSerializedSize()
@@ -100,45 +114,73 @@ int Message::GetSerializedSize()
   return sizeof(type_) + sizeof(version_) + sizeof(length_) + length_;
 }
 
-short int Message::DeserializeByte(char* buffer, int& length)
+unsigned char Message::DeserializeByte(char* buffer, int& length)
 {
-  length += 1;
-  unsigned char* ubuffer = (unsigned char*)buffer;
-  return ubuffer[0];
+  if (buffer != NULL) {
+    length += 1;
+    unsigned char* ubuffer = (unsigned char*)buffer;
+    return ubuffer[0];
+  }
+  else {
+    return 0;
+  }
+
 }
 
 short int Message::DeserializeShortInt(char* buffer, int& length)
 {
-  length += 2;
-  unsigned char* ubuffer = (unsigned char*)buffer;
-  return (ubuffer[1] << 8) | (ubuffer[0]);
+  if (buffer != NULL) {
+    length += 2;
+    unsigned char* ubuffer = (unsigned char*)buffer;
+    return (ubuffer[1] << 8) | (ubuffer[0]);
+  }
+  else {
+    return -1;
+  }
 }
 
 int Message::DeserializeInt(char* buffer, int& length)
 {
-  length += 4;
-  unsigned char* ubuffer = (unsigned char*)buffer;
-  return (ubuffer[3] << 24) | (ubuffer[2] << 16) | (ubuffer[1] << 8) | (ubuffer[0]);
+  if (buffer != NULL) {
+    length += 4;
+    unsigned char* ubuffer = (unsigned char*)buffer;
+    return (ubuffer[3] << 24) | (ubuffer[2] << 16) | (ubuffer[1] << 8) | (ubuffer[0]);
+  }
+  else {
+    return -1;
+  }
 }
 
 unsigned int Message::DeserializeUint(char* buffer, int& length)
 {
-  length += 4;
-  unsigned char* ubuffer = (unsigned char*)buffer;
-  return (ubuffer[3] << 24) | (ubuffer[2] << 16) | (ubuffer[1] << 8) | (ubuffer[0]);
+  if (buffer != NULL) {
+    length += 4;
+    unsigned char* ubuffer = (unsigned char*)buffer;
+    return (ubuffer[3] << 24) | (ubuffer[2] << 16) | (ubuffer[1] << 8) | (ubuffer[0]);
+  }
+  else {
+    return 0;
+  }
 }
 
 String Message::DeserializeString(char* buffer, int& length)
 {
-  String value(buffer);
-  length = value.length() + 1; // for null terminator;
-  return value;
+  if (buffer != NULL) {
+    String value(buffer);
+    length = value.length() + 1; // for null terminator;
+    return value;
+  }
+  else {
+    return "";
+  }
 }
 
 void Message::DeserializeBuffer(char* buffer, int& length, char* value, int count)
 {
-  memcpy(buffer, value, count);
-  length += count;
+  if ((buffer != NULL) && (value != NULL) && (count > 0)) {
+    memcpy(buffer, value, count);
+    length += count;
+  }
 }
 
 void Message::Deserialize(char* buffer, int& length)
@@ -156,42 +198,44 @@ void Message::Deserialize(char* buffer, int& length)
 
 void Message::DeserializeHeader(char* buffer, int length)
 {
-  int temp = 0;
-  type_ = DeserializeShortInt(buffer, temp);
-  version_ = DeserializeShortInt(buffer + temp, temp);
-  length_ = DeserializeInt(buffer + temp, temp);
-  delete[] body_;
-  if (length_ > 0) {
-  	body_ = new char[length_];
-  }
-  else {
-  	body_ = 0;
+  if ((buffer != NULL) && length >= GetHeaderSize()) {
+    int offset = 0;
+    type_ = DeserializeShortInt(buffer, offset);
+    version_ = DeserializeShortInt(buffer + offset, offset);
+    length_ = DeserializeInt(buffer + offset, offset);
+    delete[] body_;
+    if (length_ > 0) {
+      body_ = new char[length_];
+    }
+    else {
+      body_ = 0;
+    }
   }
 }
 
 short int Message::type()
 {
-	return type_;
+  return type_;
 }
 
 short int Message::version()
 {
-	return version_;
+  return version_;
 }
 
 int Message::length()
 {
-	return length_;
+  return length_;
 }
 
 char* Message::body()
 {
-	return body_;
+  return body_;
 }
 
 int Message::GetHeaderSize()
 {
-	return sizeof(type_) + sizeof(version_) + sizeof(length_);
+  return sizeof(type_) + sizeof(version_) + sizeof(length_);
 }
 } // namespace dispatch
 
