@@ -37,7 +37,10 @@ Client::Client(int port)
 
 Client::~Client()
 {
-  socket_->Close();
+  if (socket_ != 0) {
+    socket_->Close();
+  }
+  
   socket_ = 0;
   mailer_ = 0;
 }
